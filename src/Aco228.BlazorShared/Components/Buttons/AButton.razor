@@ -17,14 +17,20 @@
 </button>
 
 @code {
+    [Inject] public NavigationManager NavigationManager { get; set; }
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string? Subtitle { get; set; }
     [Parameter] public bool Disabled { get; set; }
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string Redirect { get; set; }
 
     private async Task OnClickCallback()
     {
-        await OnClick.InvokeAsync();
+        if(!string.IsNullOrEmpty(Redirect))
+            NavigationManager.NavigateTo(Redirect);
+        else
+            await OnClick.InvokeAsync();
+            
     }
 }

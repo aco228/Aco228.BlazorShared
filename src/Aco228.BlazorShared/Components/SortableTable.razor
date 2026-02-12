@@ -1,0 +1,126 @@
+﻿@using Aco228.BlazorShared.Components.Page
+@using Aco228.BlazorShared.Models.SortableTable
+@using Aco228.Common.Extensions
+
+<SectionBase Title="@Title" Subtitle="@Subtitle">
+    <table class="simple-table">
+        <tr>
+            @if (IsSelectable)
+            {
+                <td></td>
+            }
+            @foreach (var prop in _properties)
+            {
+                if (prop.IsIgnored)
+                    continue;
+
+                <td @onclick="() => SortBy(prop)">
+                    @prop.Name
+                </td>
+            }
+        </tr>
+        @foreach (var obj in Table)
+        {
+            if (!obj.IsVisible)
+                continue;
+            
+            <tr>
+                @if (IsSelectable)
+                {
+                    <td>
+                        @if (obj.IsSelected)
+                        {
+                            <input type="checkbox" checked @onchange="(e) => ImplOnSelectChanged(e, obj)"/>
+                        }
+                        else
+                        {
+                            <input type="checkbox" @onchange="(e) => ImplOnSelectChanged(e, obj)"/>
+                        }
+                    </td>
+                }
+                @foreach (var prop in _properties)
+                {
+                    if (prop.IsIgnored)
+                        continue;
+                    
+                    prop.Initialize(obj);
+
+                    if (string.IsNullOrEmpty(prop.Url))
+                    {
+                        <td>
+                            @if (prop.Attribute.Clickable)
+                            {
+                                <a href="#" @onclick="() => OnPropertyClicked(obj)">@prop.GetValue(obj)</a>
+                            }
+                            else
+                            {
+                                @prop.GetValue(obj)
+                            }
+                        </td>   
+                    }
+                    else
+                    {
+                        <td>
+                            <a href="@prop.Url">@prop.GetValue(obj)</a>
+                        </td>
+                    }
+                }
+            </tr>
+        }
+    </table>
+</SectionBase>
+
+@typeparam TEntry where TEntry : Aco228.BlazorShared.Models.SortableTable.SortableTableEntry
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Subtitle { get; set; }
+    [Parameter] public bool IsSelectable { get; set; } = false;
+    [Parameter] public IEnumerable<TEntry> Table { get; set; }
+    [Parameter] public EventCallback<TEntry> OnSelectChanged { get; set; }
+    [Parameter] public EventCallback<TEntry> OnEntryClicked { get; set; }
+    
+    private Type _type;
+    private List<SortableTableProperty<TEntry>> _properties = new();
+    
+    protected override void OnParametersSet()
+    {
+        if(_properties.Any())
+            return;
+        
+        _type = Table.GetType().GetGenericArguments().Single();
+
+        foreach (var prop in _type.GetProperties().ToList())
+        {
+            if (!prop.PropertyType.IsSimple())
+                continue;
+
+            var attr = prop.GetAttribute<SortableTableNameAttribute>();
+            _properties.Add(new()
+            {
+                Attribute = attr,
+                PropertyInfo = prop,
+                IsIgnored = attr?.Ignore ?? false,
+                Name = attr?.Name ?? prop.Name,
+            });   
+        }
+    }
+
+    private void SortBy(SortableTableProperty<TEntry> prop)
+    {
+        var parameter = prop.PropertyInfo;
+        Table = Table.OrderByDescending(x => parameter.GetValue(x, null)).ToList();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ImplOnSelectChanged(ChangeEventArgs obj, TEntry entry)
+    {
+        entry.IsSelected = !entry.IsSelected;
+        OnSelectChanged.InvokeAsync(entry);
+    }
+
+    private void OnPropertyClicked(TEntry entry)
+    {
+        OnEntryClicked.InvokeAsync(entry);
+    }
+
+}

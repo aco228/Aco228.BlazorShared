@@ -6,6 +6,7 @@ namespace Aco228.BlazorShared.Code;
 
 public abstract class PageImplementation : ComponentBase, IDisposable
 {
+    [Inject] public NavigationManager Navigation { get; set; }
     [Inject] public INotificationMediator Notifications { get; set; }
     [Inject] public IJSRuntime JsRuntime { get; set; }
     public EventHandler EventStateHasChanged { get; set; }
