@@ -1,4 +1,7 @@
-﻿using LiteDB;
+﻿
+
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Aco228.BlazorShared.Models.SortableTable;
 
@@ -15,6 +18,9 @@ public class SortableTableNameAttribute : Attribute
 
 public class SortableTableEntry
 {
+    [SortableTableName(Ignore = true)]
+    public ObjectId Id { get; set; }
+    
     [BsonIgnore]
     [SortableTableName(Ignore = true)]
     public bool IsVisible { get; set; } = true;

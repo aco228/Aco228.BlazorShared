@@ -4,6 +4,11 @@
 <div class="section">
     <div class="section-header">
         <div class="section-header-text">
+            @if (Visibility != null)
+            {
+                <span class="section-opener" @onclick="OnVisibilityClicked"></span>
+                
+            }
             <span class="section-title">@Title</span>
             @if (!string.IsNullOrEmpty(Subtitle))
             {
@@ -20,15 +25,40 @@
             </div>
         }
     </div>
-    <div class="section-body">
-        @ChildContent
-    </div>
+    @if (Visibility == null || Visibility.IsVisible)
+    {
+        @if (Page?.CombinedIsLoading == true || Component?.IsActionLoading == true)
+        {
+            <div class="page-loading-overlay">
+                <div class="page-loading-spinner"></div>
+            </div>
+        }
+        <div class="section-body">
+            @ChildContent
+        </div>
+        @if (!string.IsNullOrEmpty(Component?.ErrorMessage))
+        {
+            <div class="page-error" @onclick="() => Component?.SetErrorMessage(string.Empty)">
+                <span class="page-error-icon">!</span>
+                <span>@Component.ErrorMessage</span>
+            </div>
+        }
+    }
 </div>
 
 @code {
-    [Parameter] public PageImplementation Page { get; set; }
+    [Parameter] public PageImplementation? Page { get; set; }
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string? Subtitle { get; set; }
     [Parameter] public List<SectionButton>? Buttons { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public VisibilityModel? Visibility { get; set; }
+    [Parameter] public ComponentImplementation? Component { get; set; }
+
+    
+    private void OnVisibilityClicked()
+    {
+        Visibility?.OnChange();
+    }
+
 }
