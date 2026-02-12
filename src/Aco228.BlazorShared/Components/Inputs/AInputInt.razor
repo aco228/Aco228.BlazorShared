@@ -1,0 +1,31 @@
+
+<AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
+    <input class="a-input"
+           type="number"
+           value="@Value"
+           disabled="@(Disabled || IsLoading)"
+           placeholder="@Placeholder"
+           @oninput="OnInput" />
+</AInputBase>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public int Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public EventCallback<int> OnChange { get; set; }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var parsed))
+        {
+            Value = parsed;
+            await ValueChanged.InvokeAsync(Value);
+            await OnChange.InvokeAsync(Value);
+        }
+    }
+}

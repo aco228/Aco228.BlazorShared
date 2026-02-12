@@ -1,0 +1,51 @@
+
+<div class="a-toggle-field @(Disabled ? "a-toggle-field--disabled" : "")"
+     style="@(Width > 0 ? $"max-width:{Width}px" : "")">
+    <div class="a-toggle-switch">
+        @if (IsLoading)
+        {
+            <span class="a-toggle-spinner"></span>
+        }
+        else
+        {
+            <button class="a-toggle @(Value ? "a-toggle--on" : "")"
+                    type="button"
+                    disabled="@Disabled"
+                    @onclick="OnToggle">
+                <span class="a-toggle-thumb"></span>
+            </button>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Title) || !string.IsNullOrEmpty(Subtitle))
+    {
+        <div class="a-toggle-text" @onclick="OnToggle">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <span class="a-toggle-title">@Title</span>
+            }
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <span class="a-toggle-subtitle">@Subtitle</span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public bool Value { get; set; }
+    [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+    [Parameter] public EventCallback<bool> OnChange { get; set; }
+
+    private async Task OnToggle()
+    {
+        if (Disabled || IsLoading) return;
+        Value = !Value;
+        await ValueChanged.InvokeAsync(Value);
+        await OnChange.InvokeAsync(Value);
+    }
+}

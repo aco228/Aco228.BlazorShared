@@ -1,0 +1,49 @@
+
+<div class="layout-col" style="@Style">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int Padding { get; set; } = 0;
+    [Parameter] public int Margin { get; set; } = 0;
+    [Parameter] public int Gap { get; set; } = 4;
+    [Parameter] public LayoutFrom From { get; set; } = LayoutFrom.Start;
+    [Parameter] public LayoutAlign Align { get; set; } = LayoutAlign.Stretch;
+    [Parameter] public string? Grow { get; set; }
+    [Parameter] public string? Basis { get; set; }
+
+    private string Style
+    {
+        get
+        {
+            var parts = new List<string>();
+
+            parts.Add($"justify-content:{FromValue}");
+            parts.Add($"align-items:{AlignValue}");
+            parts.Add($"padding:{Padding}px");
+            parts.Add($"margin:{Margin}px");
+            parts.Add($"gap:{Gap}px");
+            if (!string.IsNullOrEmpty(Grow)) parts.Add($"flex-grow:{Grow}");
+            if (!string.IsNullOrEmpty(Basis)) parts.Add($"flex-basis:{Basis}");
+
+            return string.Join(";", parts);
+        }
+    }
+
+    private string FromValue => From switch
+    {
+        LayoutFrom.End => "flex-end",
+        LayoutFrom.Center => "center",
+        LayoutFrom.Between => "space-between",
+        _ => "flex-start"
+    };
+
+    private string AlignValue => Align switch
+    {
+        LayoutAlign.Start => "flex-start",
+        LayoutAlign.End => "flex-end",
+        LayoutAlign.Center => "center",
+        _ => "stretch"
+    };
+}

@@ -1,0 +1,62 @@
+@using Aco228.BlazorShared.Code
+@implements IDisposable
+
+<div class="page">
+    <div class="page-header">
+        <h1 class="title">@Page.Title</h1>
+        @if (!string.IsNullOrEmpty(Page.Subtitle))
+        {
+            <p class="subtitle">@Page.Subtitle</p>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(Page.CombinedErrorMessage))
+    {
+        <div class="page-error">
+            <span class="page-error-icon">!</span>
+            <span>@Page.CombinedErrorMessage</span>
+        </div>
+    }
+
+    <div class="page-body">
+        @if (Page.CombinedIsLoading)
+        {
+            <div class="page-loading-overlay">
+                <div class="page-loading-spinner"></div>
+            </div>
+        }
+        <div class="page-content @(Page.CombinedIsLoading ? "page-content--loading" : "")">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public PageImplementation Page { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private PageImplementation? _subscribedPage;
+
+    protected override void OnParametersSet()
+    {
+        if (_subscribedPage == Page)
+            return;
+
+        if (_subscribedPage != null)
+            _subscribedPage.EventStateHasChanged -= OnStateIsChanged;
+
+        Page.EventStateHasChanged += OnStateIsChanged;
+        _subscribedPage = Page;
+    }
+
+    private async void OnStateIsChanged(object? sender, EventArgs e)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (_subscribedPage != null)
+            _subscribedPage.EventStateHasChanged -= OnStateIsChanged;
+    }
+}

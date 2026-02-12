@@ -1,0 +1,35 @@
+
+<AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
+    <textarea class="a-textarea"
+              disabled="@(Disabled || IsLoading)"
+              placeholder="@Placeholder"
+              rows="@CurrentRows"
+              style="@OverflowStyle"
+              @oninput="OnInput">@Value</textarea>
+</AInputBase>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string> OnChange { get; set; }
+    [Parameter] public int MaxLines { get; set; } = 10;
+
+    private int LineCount => string.IsNullOrEmpty(Value) ? 1 : Value.Split('\n').Length;
+
+    private int CurrentRows => Math.Clamp(LineCount, 1, MaxLines);
+
+    private string OverflowStyle => LineCount > MaxLines ? "overflow-y:auto" : "overflow-y:hidden";
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString() ?? string.Empty;
+        await ValueChanged.InvokeAsync(Value);
+        await OnChange.InvokeAsync(Value);
+    }
+}

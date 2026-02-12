@@ -1,0 +1,34 @@
+@using Aco228.BlazorShared.Code
+@using Aco228.BlazorShared.Models
+
+<div class="section">
+    <div class="section-header">
+        <div class="section-header-text">
+            <span class="section-title">@Title</span>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <span class="section-subtitle">@Subtitle</span>
+            }
+        </div>
+        @if (Buttons is { Count: > 0 })
+        {
+            <div class="section-actions">
+                @foreach (var btn in Buttons)
+                {
+                    <button class="section-btn" @onclick="btn.OnClick">@btn.Title</button>
+                }
+            </div>
+        }
+    </div>
+    <div class="section-body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public PageImplementation Page { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public List<SectionButton>? Buttons { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,81 @@
+@using Aco228.BlazorShared.Code
+@implements IDisposable
+
+<div class="notification-center">
+    @foreach (var notification in _notifications)
+    {
+        <div class="notification @(notification.Type == NotificationType.Success ? "notification--success" : "notification--error") @(_removing.Contains(notification.Id) ? "notification--removing" : "")">
+            <div class="notification-icon">
+                @if (notification.Type == NotificationType.Success)
+                {
+                    <span>&#10003;</span>
+                }
+                else
+                {
+                    <span>!</span>
+                }
+            </div>
+            <div class="notification-body">
+                <span class="notification-title">@notification.Title</span>
+                @if (!string.IsNullOrEmpty(notification.Description))
+                {
+                    <span class="notification-description">@notification.Description</span>
+                }
+            </div>
+            <button class="notification-close" @onclick="() => Dismiss(notification.Id)">&times;</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] public INotificationMediator Mediator { get; set; } = default!;
+
+    private readonly List<NotificationDto> _notifications = new();
+    private readonly HashSet<string> _removing = new();
+    private readonly Dictionary<string, Timer> _timers = new();
+
+    [Parameter] public int DurationMs { get; set; } = 5000;
+
+    protected override void OnInitialized()
+    {
+        Mediator.OnNotificationReceived += OnNotification;
+    }
+
+    private async void OnNotification(object? sender, NotificationDto notification)
+    {
+        await InvokeAsync(() =>
+        {
+            _notifications.Add(notification);
+            StateHasChanged();
+
+            var timer = new Timer(_ => _ = InvokeAsync(() => Dismiss(notification.Id)), null, DurationMs, Timeout.Infinite);
+            _timers[notification.Id] = timer;
+        });
+    }
+
+    private async Task Dismiss(string id)
+    {
+        if (_removing.Contains(id)) return;
+
+        _removing.Add(id);
+        StateHasChanged();
+
+        await Task.Delay(300);
+
+        _notifications.RemoveAll(n => n.Id == id);
+        _removing.Remove(id);
+
+        if (_timers.Remove(id, out var timer))
+            timer.Dispose();
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Mediator.OnNotificationReceived -= OnNotification;
+        foreach (var timer in _timers.Values)
+            timer.Dispose();
+        _timers.Clear();
+    }
+}
