@@ -6,25 +6,44 @@ namespace Aco228.BlazorShared.Code;
 
 public abstract class PageImplementation : ComponentBase, IDisposable
 {
+    [Inject] public INotificationMediator Notifications { get; set; }
     [Inject] public IJSRuntime JsRuntime { get; set; }
     public EventHandler EventStateHasChanged { get; set; }
 
+    public bool IsInitialized { get; set; } = false;
     public abstract string Title { get; }
     public virtual string Subtitle { get; } = string.Empty;
-    public string? ErrorMessage { get; set; }
+    public string FatalErrorMessage { get; set; } = string.Empty;
     public bool IsLoading { get; set; } = false;
     
     public bool IsActionLoading { get; set; } = false;
-    public string ActionErrorMessage { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; } = string.Empty;
 
     public bool CombinedIsLoading => IsLoading || IsActionLoading;
-    public string CombinedErrorMessage => !string.IsNullOrEmpty(ErrorMessage) ? ErrorMessage : ActionErrorMessage;
 
-    public string GetErrorMessage() => CombinedErrorMessage;
+    protected virtual Task OnFirstRender() => Task.FromResult(true);
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(!firstRender)
+            return;
+
+        await OnFirstRender();
+        IsInitialized = true;
+        InvokeStateHasChanged();
+    }
+
+    public string GetErrorMessage() => ErrorMessage;
     public bool HasErrorMessage() => !string.IsNullOrEmpty(ErrorMessage);
     protected void SetErrorMessage(string? errorMessage = null)
     {
-        ErrorMessage = errorMessage;
+        ErrorMessage = errorMessage ?? string.Empty;
+        InvokeStateHasChanged();
+    }
+
+    public void SetFatalErrorMessage(string errorMessage)
+    {
+        FatalErrorMessage = errorMessage;
         InvokeStateHasChanged();
     }
     
@@ -38,7 +57,7 @@ public abstract class PageImplementation : ComponentBase, IDisposable
     {
         try
         {
-            ActionErrorMessage = String.Empty;
+            ErrorMessage = String.Empty;
             IsActionLoading = true;
             InvokeStateHasChanged();
 
@@ -46,7 +65,7 @@ public abstract class PageImplementation : ComponentBase, IDisposable
         }
         catch (Exception ex)
         {
-            ActionErrorMessage = ex.ToString();
+            ErrorMessage = ex.ToString();
         }
         finally
         {

@@ -9,26 +9,39 @@
             <p class="subtitle">@Page.Subtitle</p>
         }
     </div>
-
-    @if (!string.IsNullOrEmpty(Page.CombinedErrorMessage))
+    
+    @if (!Page.IsInitialized)
     {
-        <div class="page-error">
-            <span class="page-error-icon">!</span>
-            <span>@Page.CombinedErrorMessage</span>
+        <div class="page-loading-overlay">
+            <div class="page-loading-spinner"></div>
         </div>
     }
-
-    <div class="page-body">
-        @if (Page.CombinedIsLoading)
+    else if (!string.IsNullOrEmpty(Page.FatalErrorMessage))
+    {
+        <strong>@Page.FatalErrorMessage</strong>
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(Page.ErrorMessage))
         {
-            <div class="page-loading-overlay">
-                <div class="page-loading-spinner"></div>
+            <div class="page-error">
+                <span class="page-error-icon">!</span>
+                <span>@Page.ErrorMessage</span>
             </div>
         }
-        <div class="page-content @(Page.CombinedIsLoading ? "page-content--loading" : "")">
-            @ChildContent
+
+        <div class="page-body">
+            @if (Page.CombinedIsLoading)
+            {
+                <div class="page-loading-overlay">
+                    <div class="page-loading-spinner"></div>
+                </div>
+            }
+            <div class="page-content @(Page.CombinedIsLoading ? "page-content--loading" : "")">
+                @ChildContent
+            </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {

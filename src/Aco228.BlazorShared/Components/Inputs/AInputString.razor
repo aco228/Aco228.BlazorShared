@@ -15,9 +15,9 @@
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public int Width { get; set; }
     [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string Value { get; set; } = string.Empty;
-    [Parameter] public EventCallback<string> ValueChanged { get; set; }
-    [Parameter] public EventCallback<string> OnChange { get; set; }
+    [Parameter] public string? Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string?> OnChange { get; set; }
 
     private async Task OnInput(ChangeEventArgs e)
     {
