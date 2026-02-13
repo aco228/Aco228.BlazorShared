@@ -27,22 +27,25 @@
                 </div>
             }
         </div>
-        <div class="a-selectlist-add">
-            <input class="a-selectlist-add-input"
-                   type="text"
-                   placeholder="@(Placeholder ?? "Add entry...")"
-                   disabled="@(Disabled || IsLoading)"
-                   value="@_newItemText"
-                   @oninput="e => _newItemText = e.Value?.ToString() ?? string.Empty"
-                   @onkeydown="OnAddKeyDown" />
-            <button class="a-selectlist-add-btn"
-                    type="button"
-                    disabled="@(Disabled || IsLoading || string.IsNullOrWhiteSpace(_newItemText))"
-                    @onclick="AddEntry"
-                    title="Add">
-                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
-            </button>
-        </div>
+        @if (SupportEdit)
+        {
+            <div class="a-selectlist-add">
+                <input class="a-selectlist-add-input"
+                       type="text"
+                       placeholder="@(Placeholder ?? "Add entry...")"
+                       disabled="@(Disabled || IsLoading)"
+                       value="@_newItemText"
+                       @oninput="e => _newItemText = e.Value?.ToString() ?? string.Empty"
+                       @onkeydown="OnAddKeyDown" />
+                <button class="a-selectlist-add-btn"
+                        type="button"
+                        disabled="@(Disabled || IsLoading || string.IsNullOrWhiteSpace(_newItemText))"
+                        @onclick="AddEntry"
+                        title="Add">
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                </button>
+            </div>
+        }
     </div>
 </AInputBase>
 
@@ -53,6 +56,7 @@
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public int Width { get; set; }
     [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public bool SupportEdit { get; set; } = false;
 
     /// <summary>Pool of available entries (the possibilities).</summary>
     [Parameter] public List<TEntry> Entries { get; set; } = new();
@@ -119,6 +123,9 @@
 
     private async Task RemoveEntry(TEntry entry)
     {
+        if(!SupportEdit)
+            return;
+        
         Entries.Remove(entry);
         var wasSelected = Selected.Remove(entry);
         await EntriesChanged.InvokeAsync(Entries);

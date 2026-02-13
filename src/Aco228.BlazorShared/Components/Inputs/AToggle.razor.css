@@ -1,4 +1,5 @@
 .a-toggle-field {
+    margin: 3px;
     display: flex;
     align-items: center;
     gap: 0.5rem;

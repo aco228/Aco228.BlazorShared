@@ -11,7 +11,8 @@
                        type="@InputType"
                        value="@Value[index]"
                        disabled="@(Disabled || IsLoading)"
-                       @onchange="e => UpdateItem(index, e)" />
+                       @onchange="e => UpdateItem(index, e)"
+                       @key="@($"{index}_{Value[index]}")" />
                 <button class="a-input-list-btn a-input-list-btn--remove"
                         type="button"
                         disabled="@(Disabled || IsLoading)"

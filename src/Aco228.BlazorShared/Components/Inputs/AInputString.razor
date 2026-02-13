@@ -2,10 +2,11 @@
 <AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
     <input class="a-input"
            type="text"
-           value="@Value"
+           @bind="Value"
+           @bind:event="oninput"
+           @bind:after="NotifyChanged"
            disabled="@(Disabled || IsLoading)"
-           placeholder="@Placeholder"
-           @oninput="OnInput" />
+           placeholder="@Placeholder" />
 </AInputBase>
 
 @code {
@@ -19,9 +20,8 @@
     [Parameter] public EventCallback<string?> ValueChanged { get; set; }
     [Parameter] public EventCallback<string?> OnChange { get; set; }
 
-    private async Task OnInput(ChangeEventArgs e)
+    private async Task NotifyChanged()
     {
-        Value = e.Value?.ToString() ?? string.Empty;
         await ValueChanged.InvokeAsync(Value);
         await OnChange.InvokeAsync(Value);
     }
