@@ -1,0 +1,138 @@
+@typeparam TEntry
+
+<AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
+    <div class="a-selectlist">
+        <div class="a-selectlist-chips">
+            @foreach (var entry in Entries)
+            {
+                var isSelected = Selected.Contains(entry);
+                <div class="a-selectlist-chip @(isSelected ? "a-selectlist-chip--selected" : "")">
+                    <button class="a-selectlist-chip-toggle"
+                            type="button"
+                            disabled="@(Disabled || IsLoading)"
+                            @onclick="() => Toggle(entry)">
+                        @if (isSelected)
+                        {
+                            <svg class="a-selectlist-chip-icon" viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>
+                        }
+                        <span>@FormatEntry(entry)</span>
+                    </button>
+                    <button class="a-selectlist-chip-remove"
+                            type="button"
+                            disabled="@(Disabled || IsLoading)"
+                            @onclick="() => RemoveEntry(entry)"
+                            title="Remove">
+                        <svg viewBox="0 0 16 16" fill="currentColor" width="10" height="10"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                    </button>
+                </div>
+            }
+        </div>
+        <div class="a-selectlist-add">
+            <input class="a-selectlist-add-input"
+                   type="text"
+                   placeholder="@(Placeholder ?? "Add entry...")"
+                   disabled="@(Disabled || IsLoading)"
+                   value="@_newItemText"
+                   @oninput="e => _newItemText = e.Value?.ToString() ?? string.Empty"
+                   @onkeydown="OnAddKeyDown" />
+            <button class="a-selectlist-add-btn"
+                    type="button"
+                    disabled="@(Disabled || IsLoading || string.IsNullOrWhiteSpace(_newItemText))"
+                    @onclick="AddEntry"
+                    title="Add">
+                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+            </button>
+        </div>
+    </div>
+</AInputBase>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+
+    /// <summary>Pool of available entries (the possibilities).</summary>
+    [Parameter] public List<TEntry> Entries { get; set; } = new();
+    [Parameter] public EventCallback<List<TEntry>> EntriesChanged { get; set; }
+
+    /// <summary>Currently selected entries from the pool.</summary>
+    [Parameter] public HashSet<TEntry> Selected { get; set; } = new();
+    [Parameter] public EventCallback<HashSet<TEntry>> SelectedChanged { get; set; }
+
+    /// <summary>Fired when a single entry is toggled (selected or deselected).</summary>
+    [Parameter] public EventCallback<TEntry> OnSelected { get; set; }
+
+    /// <summary>Fired when the selected collection changes.</summary>
+    [Parameter] public EventCallback<IEnumerable<TEntry>> OnChange { get; set; }
+
+    /// <summary>Optional display formatter. Defaults to ToString().</summary>
+    [Parameter] public Func<TEntry, string>? DisplayFunc { get; set; }
+
+    /// <summary>Optional parser from string input to TEntry. Required for non-string types.</summary>
+    [Parameter] public Func<string, TEntry>? ParseFunc { get; set; }
+
+    private string _newItemText = string.Empty;
+
+    private string FormatEntry(TEntry entry)
+    {
+        if (DisplayFunc is not null)
+            return DisplayFunc(entry);
+        return entry?.ToString() ?? string.Empty;
+    }
+
+    private TEntry? ParseInput(string input)
+    {
+        if (ParseFunc is not null)
+            return ParseFunc(input);
+
+        if (typeof(TEntry) == typeof(string))
+            return (TEntry)(object)input;
+
+        try { return (TEntry)Convert.ChangeType(input, typeof(TEntry)); }
+        catch { return default; }
+    }
+
+    private async Task Toggle(TEntry entry)
+    {
+        if (Selected.Contains(entry))
+            Selected.Remove(entry);
+        else
+            Selected.Add(entry);
+
+        await SelectedChanged.InvokeAsync(Selected);
+        await OnSelected.InvokeAsync(entry);
+        await OnChange.InvokeAsync(Selected);
+    }
+
+    private async Task AddEntry()
+    {
+        var parsed = ParseInput(_newItemText);
+        if (parsed is null || Entries.Contains(parsed)) return;
+
+        Entries.Add(parsed);
+        _newItemText = string.Empty;
+        await EntriesChanged.InvokeAsync(Entries);
+    }
+
+    private async Task RemoveEntry(TEntry entry)
+    {
+        Entries.Remove(entry);
+        var wasSelected = Selected.Remove(entry);
+        await EntriesChanged.InvokeAsync(Entries);
+
+        if (wasSelected)
+        {
+            await SelectedChanged.InvokeAsync(Selected);
+            await OnChange.InvokeAsync(Selected);
+        }
+    }
+
+    private async Task OnAddKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_newItemText))
+            await AddEntry();
+    }
+}
