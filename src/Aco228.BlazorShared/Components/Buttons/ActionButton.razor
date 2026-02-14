@@ -1,0 +1,13 @@
+
+<button class="action-btn"
+        type="button"
+        disabled="@Disabled"
+        @onclick="OnClick">
+    @Title
+</button>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+}

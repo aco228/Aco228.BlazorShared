@@ -21,8 +21,4 @@
       <ProjectReference Include="..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Components\Buttons\" />
-    </ItemGroup>
-
 </Project>
