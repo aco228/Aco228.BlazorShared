@@ -1,0 +1,36 @@
+
+<div class="model @(Model.IsSelected ? "model--selected" : "")">
+    <div class="model-header" @onclick="OnHeaderClicked">
+        <div class="model-chevron @(Model.IsVisible ? "model-chevron--open" : "")">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M3 1.5L7 5L3 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="model-header-text">
+            <span class="model-title">@Title</span>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <span class="model-subtitle">@Subtitle</span>
+            }
+        </div>
+    </div>
+    @if (Model.IsVisible)
+    {
+        <div class="model-body">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@typeparam TEntry
+@code {
+    [Parameter] public UIModel<TEntry> Model { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private void OnHeaderClicked()
+    {
+        Model.IsVisible = !Model.IsVisible;
+    }
+}

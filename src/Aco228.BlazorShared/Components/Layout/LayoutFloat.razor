@@ -1,0 +1,25 @@
+﻿
+<div class="layout-float" style="@Style">
+    @ChildContent
+    <div style="clear:both"></div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int Padding { get; set; } = 3;
+    [Parameter] public int Margin { get; set; } = 0;
+    
+
+    private string Style
+    {
+        get
+        {
+            var parts = new List<string>();
+
+            parts.Add($"padding:{Padding}px");
+            parts.Add($"margin:{Margin}px");
+
+            return string.Join(";", parts);
+        }
+    }
+}
