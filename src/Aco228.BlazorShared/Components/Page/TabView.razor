@@ -1,0 +1,65 @@
+@using Aco228.BlazorShared.Models
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="tab-view">
+    <div class="tab-header">
+        <nav class="tab-nav">
+            @foreach (var link in Links)
+            {
+                <a class="tab-link @(IsActive(link.Href) ? "tab-link--active" : "")"
+                   href="@link.Href"
+                   @onclick="() => Navigate(link.Href)"
+                   @onclick:preventDefault="true">
+                    @link.Title
+                </a>
+            }
+        </nav>
+        @if (Actions != null)
+        {
+            <div class="tab-actions">
+                @Actions
+            </div>
+        }
+    </div>
+    <div class="tab-body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<TabViewLink> Links { get; set; } = new();
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string _currentUri = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _currentUri = Nav.Uri;
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _currentUri = e.Location;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsActive(string href)
+    {
+        var relative = Nav.ToAbsoluteUri(href).AbsolutePath.TrimEnd('/');
+        var current = new Uri(_currentUri).AbsolutePath.TrimEnd('/');
+        return string.Equals(current, relative, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void Navigate(string href)
+    {
+        Nav.NavigateTo(href);
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}

@@ -48,7 +48,7 @@
                     if (string.IsNullOrEmpty(prop.Url))
                     {
                         <td>
-                            @if (prop.Attribute.Clickable)
+                            @if (prop.Attribute?.Clickable == true)
                             {
                                 <a href="#" @onclick="() => OnPropertyClicked(obj)">@prop.GetValue(obj)</a>
                             }
