@@ -61,6 +61,39 @@
     padding: 1rem;
     overflow-y: auto;
     flex: 1;
+    position: relative;
+}
+
+.modal-loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 3rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(2px);
+    z-index: 10;
+    border-radius: 0 0 10px 10px;
+}
+
+.modal-loading-spinner {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 2.5px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: modal-spin 0.65s linear infinite;
+}
+
+.modal-content--loading {
+    opacity: 0.3;
+    pointer-events: none;
+    user-select: none;
+}
+
+@keyframes modal-spin {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes modal-fade-in {
