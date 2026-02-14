@@ -1,6 +1,7 @@
 ﻿@using Aco228.BlazorShared.Components.Page
 @using Aco228.BlazorShared.Models.SortableTable
 @using Aco228.Common.Extensions
+@using Aco228.MongoDb.Models
 
 <SectionBase Title="@Title" Subtitle="@Subtitle">
     <table class="simple-table">
@@ -88,11 +89,14 @@
             return;
         
         _type = Table.GetType().GetGenericArguments().Single();
+        var ignoreClasses = new List<Type> { typeof(IdDocument) };
 
         foreach (var prop in _type.GetProperties().ToList())
         {
-            if (!prop.PropertyType.IsSimple())
-                continue;
+            if (!prop.PropertyType.IsSimple() && !ignoreClasses.Contains(prop.PropertyType))
+            {
+                    continue;
+            }
 
             var attr = prop.GetAttribute<SortableTableNameAttribute>();
             _properties.Add(new()

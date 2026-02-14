@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Aco228.Common.Extensions;
+using Aco228.MongoDb.Models;
 using Humanizer;
 
 namespace Aco228.BlazorShared.Models.SortableTable;
@@ -48,6 +49,11 @@ public class SortableTableProperty<TEntry>
                     return ((long) val).FromUnixTimestampMilliseconds().Humanize();
                 if (Attribute?.HumanizeDateUtc == true)
                     return ((long) val).FromUnixTimestampMillisecondsUtc().Humanize(utcDate: true);   
+            }
+
+            if (val is IdDocument)
+            {
+                return ((IdDocument) val)?.Name ?? "";
             }
 
             if (val is DateTime)
