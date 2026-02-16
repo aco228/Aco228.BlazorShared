@@ -28,6 +28,7 @@
     [Parameter] public List<TEntry> Value { get; set; } = new();
     [Parameter] public EventCallback<List<TEntry>> ValueChanged { get; set; }
     [Parameter] public EventCallback<List<TEntry>> OnChange { get; set; }
+    [Parameter] public EventCallback<TEntry> OnElementClicked { get; set; }
 
     private TEntry[] _entries = Array.Empty<TEntry>();
 
@@ -49,6 +50,7 @@
         else
             Value.Add(entry);
 
+        await OnElementClicked.InvokeAsync(entry);
         await ValueChanged.InvokeAsync(Value);
         await OnChange.InvokeAsync(Value);
     }
