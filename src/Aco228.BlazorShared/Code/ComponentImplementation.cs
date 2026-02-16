@@ -5,6 +5,7 @@ namespace Aco228.BlazorShared.Code;
 
 public class ComponentImplementation : ComponentBase
 {
+    [Inject] public NavigationManager Navigation { get; set; }
     [Inject] public INotificationMediator Notifications { get; set; }
     [Parameter] public VisibilityModel? Visibility { get; set; }
     

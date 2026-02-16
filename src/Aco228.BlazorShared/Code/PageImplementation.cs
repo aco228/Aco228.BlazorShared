@@ -6,7 +6,6 @@ namespace Aco228.BlazorShared.Code;
 
 public abstract class PageImplementation : ComponentImplementation
 {
-    [Inject] public NavigationManager Navigation { get; set; }
     [Inject] public IJSRuntime JsRuntime { get; set; }
 
     public abstract string Title { get; }
