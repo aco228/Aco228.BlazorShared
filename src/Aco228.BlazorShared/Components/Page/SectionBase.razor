@@ -27,7 +27,7 @@
     </div>
     @if (Visibility == null || Visibility.IsVisible)
     {
-        @if (Page?.CombinedIsLoading == true || Component?.IsActionLoading == true)
+        @if (CombinedIsLoading)
         {
             <div class="page-loading-overlay">
                 <div class="page-loading-spinner"></div>
@@ -35,7 +35,7 @@
         }
         @if (ChildContent != null)
         {
-            <div class="section-body">
+            <div class="section-body @(CombinedIsLoading ? "page-content--loading" : "")">
                 @ChildContent
             </div>
         }
@@ -43,7 +43,14 @@
         {
             <strong>Empty</strong>
         }
-        @if (!string.IsNullOrEmpty(Component?.ErrorMessage))
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="page-error">
+                <span class="page-error-icon">!</span>
+                <span>@ErrorMessage</span>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(Component?.ErrorMessage))
         {
             <div class="page-error" @onclick="() => Component?.SetErrorMessage(string.Empty)">
                 <span class="page-error-icon">!</span>
@@ -60,9 +67,12 @@
     [Parameter] public List<SectionButton>? Buttons { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public VisibilityModel? Visibility { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public ComponentImplementation? Component { get; set; }
 
-    
+    private bool CombinedIsLoading => IsLoading || Page?.CombinedIsLoading == true || Component?.IsActionLoading == true;
+
     private void OnVisibilityClicked()
     {
         Visibility?.OnChange();
