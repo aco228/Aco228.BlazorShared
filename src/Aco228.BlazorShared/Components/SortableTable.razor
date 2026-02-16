@@ -51,7 +51,7 @@
                         <td>
                             @if (prop.Attribute?.Clickable == true)
                             {
-                                <a href="#" @onclick="() => OnPropertyClicked(obj)">@prop.GetValue(obj)</a>
+                                <a href="#" @onclick="() => OnPropertyClicked(prop.Name, obj)">@prop.GetValue(obj)</a>
                             }
                             else
                             {
@@ -79,6 +79,7 @@
     [Parameter] public IEnumerable<TEntry> Table { get; set; }
     [Parameter] public EventCallback<TEntry> OnSelectChanged { get; set; }
     [Parameter] public EventCallback<TEntry> OnEntryClicked { get; set; }
+    [Parameter] public EventCallback<SortableTableEntryClick<TEntry>> OnEntryPropertyClicked { get; set; }
     
     private Type _type;
     private List<SortableTableProperty<TEntry>> _properties = new();
@@ -122,9 +123,14 @@
         OnSelectChanged.InvokeAsync(entry);
     }
 
-    private void OnPropertyClicked(TEntry entry)
+    private void OnPropertyClicked(string propertyName, TEntry entry)
     {
         OnEntryClicked.InvokeAsync(entry);
+        OnEntryPropertyClicked.InvokeAsync(new()
+        {
+            Entry = entry,
+            PropertyName = propertyName,
+        });
     }
 
 }
