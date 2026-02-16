@@ -35,6 +35,11 @@ public class SortableTableProperty<TEntry>
 
         if (val != null)
         {
+            // if (val == typeof(Enum))
+            // {
+            //     return val.ToString();
+            // }
+            
             if (val is double)
             {
                 if (double.IsInfinity((double) val) || double.IsNaN((double) val))

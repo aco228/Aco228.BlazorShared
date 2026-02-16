@@ -33,9 +33,16 @@
                 <div class="page-loading-spinner"></div>
             </div>
         }
-        <div class="section-body">
-            @ChildContent
-        </div>
+        @if (ChildContent != null)
+        {
+            <div class="section-body">
+                @ChildContent
+            </div>
+        }
+        else
+        {
+            <strong>Empty</strong>
+        }
         @if (!string.IsNullOrEmpty(Component?.ErrorMessage))
         {
             <div class="page-error" @onclick="() => Component?.SetErrorMessage(string.Empty)">
