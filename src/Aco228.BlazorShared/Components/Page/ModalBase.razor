@@ -1,7 +1,7 @@
 @if (IsOpen)
 {
-    <div class="modal-overlay" @onclick="OnOverlayClicked">
-        <div class="modal-panel" @onclick:stopPropagation="true">
+    <div class="modal-overlay" @onmousedown="OnOverlayMouseDown" @onclick="OnOverlayClicked">
+        <div class="modal-panel" @onmousedown:stopPropagation="true" @onclick:stopPropagation="true">
             <div class="modal-header">
                 <span class="modal-title">@Title</span>
                 <button class="modal-close" type="button" @onclick="Close">
@@ -43,8 +43,17 @@
         await IsOpenChanged.InvokeAsync(false);
     }
 
+    private bool _mouseDownOnOverlay;
+
+    private void OnOverlayMouseDown()
+    {
+        _mouseDownOnOverlay = true;
+    }
+
     private async Task OnOverlayClicked()
     {
-        await Close();
+        if (_mouseDownOnOverlay)
+            await Close();
+        _mouseDownOnOverlay = false;
     }
 }
