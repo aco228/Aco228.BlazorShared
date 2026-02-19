@@ -1,0 +1,65 @@
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
+    <div class="a-json-editor">
+        <pre class="a-json-pre" aria-hidden="true"><code @ref="_codeEl"></code></pre>
+        <textarea class="a-json-textarea"
+                  disabled="@(Disabled || IsLoading)"
+                  placeholder="@Placeholder"
+                  rows="@CurrentRows"
+                  style="@OverflowStyle"
+                  spellcheck="false"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  @ref="_textareaEl"
+                  @oninput="OnInput">@Value</textarea>
+    </div>
+</AInputBase>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string> OnChange { get; set; }
+    [Parameter] public int MaxLines { get; set; } = 10;
+
+    private ElementReference _codeEl;
+    private ElementReference _textareaEl;
+    private IJSObjectReference? _module;
+
+    private int LineCount => string.IsNullOrEmpty(Value) ? 1 : Value.Split('\n').Length;
+    private int CurrentRows => Math.Clamp(LineCount, 1, MaxLines);
+    private string OverflowStyle => LineCount > MaxLines ? "overflow-y:auto" : "overflow-y:hidden";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/Aco228.BlazorShared/Components/Inputs/AJsonTextArea.razor.js");
+            await _module.InvokeVoidAsync("init", _textareaEl, _codeEl, Value);
+        }
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString() ?? string.Empty;
+        await ValueChanged.InvokeAsync(Value);
+        await OnChange.InvokeAsync(Value);
+        if (_module is not null)
+            await _module.InvokeVoidAsync("updateHighlight", _codeEl, Value);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+            await _module.DisposeAsync();
+    }
+}
