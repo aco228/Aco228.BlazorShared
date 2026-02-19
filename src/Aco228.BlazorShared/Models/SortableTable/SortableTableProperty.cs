@@ -56,7 +56,7 @@ public class SortableTableProperty<TEntry>
                     return ((long) val).FromUnixTimestampMillisecondsUtc().Humanize(utcDate: true);   
             }
 
-            if (val is IdDocument)
+            if (val is IdDocument || val.GetType().IsSubclassOf(typeof(IdDocument)))
             {
                 return ((IdDocument) val)?.Name ?? "";
             }

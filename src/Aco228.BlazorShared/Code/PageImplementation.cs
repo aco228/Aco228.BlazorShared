@@ -16,6 +16,7 @@ public abstract class PageImplementation : ComponentImplementation
 
     public bool CombinedIsLoading => IsLoading || IsActionLoading;
 
+
     public void SetFatalErrorMessage(string errorMessage)
     {
         FatalErrorMessage = errorMessage;
