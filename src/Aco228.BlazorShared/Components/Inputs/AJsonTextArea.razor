@@ -8,8 +8,6 @@
         <textarea class="a-json-textarea"
                   disabled="@(Disabled || IsLoading)"
                   placeholder="@Placeholder"
-                  rows="@CurrentRows"
-                  style="@OverflowStyle"
                   spellcheck="false"
                   autocorrect="off"
                   autocapitalize="off"
@@ -34,27 +32,23 @@
     private ElementReference _textareaEl;
     private IJSObjectReference? _module;
 
-    private int LineCount => string.IsNullOrEmpty(Value) ? 1 : Value.Split('\n').Length;
-    private int CurrentRows => Math.Clamp(LineCount, 1, MaxLines);
-    private string OverflowStyle => LineCount > MaxLines ? "overflow-y:auto" : "overflow-y:hidden";
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/Aco228.BlazorShared/Components/Inputs/AJsonTextArea.razor.js");
-            await _module.InvokeVoidAsync("init", _textareaEl, _codeEl, Value);
+            await _module.InvokeVoidAsync("init", _textareaEl, _codeEl, Value, MaxLines);
         }
     }
 
     private async Task OnInput(ChangeEventArgs e)
     {
         Value = e.Value?.ToString() ?? string.Empty;
+        if (_module is not null)
+            await _module.InvokeVoidAsync("updateHighlight", _textareaEl, _codeEl, Value, MaxLines);
         await ValueChanged.InvokeAsync(Value);
         await OnChange.InvokeAsync(Value);
-        if (_module is not null)
-            await _module.InvokeVoidAsync("updateHighlight", _codeEl, Value);
     }
 
     public async ValueTask DisposeAsync()

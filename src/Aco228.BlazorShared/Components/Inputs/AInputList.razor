@@ -22,16 +22,25 @@
                 </button>
             </div>
         }
-        <div class="a-input-list-item a-input-list-item--add">
-            <span class="a-input-list-index a-input-list-index--add">
-                <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+        <div class="a-input-list-item @(string.IsNullOrEmpty(_newItemText) ? "a-input-list-item--add" : "")">
+            <span class="a-input-list-index @(string.IsNullOrEmpty(_newItemText) ? "a-input-list-index--add" : "")">
+                @if (string.IsNullOrEmpty(_newItemText))
+                {
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                }
+                else
+                {
+                    @(Value.Count + 1)<text>.</text>
+                }
             </span>
             <input class="a-input-list-value"
                    type="@InputType"
                    placeholder="@(Placeholder ?? "Add item...")"
                    disabled="@(Disabled || IsLoading)"
-                   value="@_newItemText"
+                   @key="_addInputKey"
+                   @ref="_addInputRef"
                    @oninput="e => _newItemText = e.Value?.ToString() ?? string.Empty"
+                   @onblur="OnAddBlur"
                    @onkeydown="OnAddKeyDown" />
             <button class="a-input-list-btn a-input-list-btn--add"
                     type="button"
@@ -56,6 +65,9 @@
     [Parameter] public EventCallback<List<TItem>> OnChange { get; set; }
 
     private string _newItemText = string.Empty;
+    private int _addInputKey = 0;
+    private ElementReference _addInputRef;
+    private bool _focusAddInput;
 
     private string InputType => typeof(TItem) == typeof(int) || typeof(TItem) == typeof(long)
         || typeof(TItem) == typeof(double) || typeof(TItem) == typeof(float)
@@ -75,12 +87,35 @@
         await OnChange.InvokeAsync(Value);
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusAddInput)
+        {
+            _focusAddInput = false;
+            await _addInputRef.FocusAsync();
+        }
+    }
+
     private async Task AddItem()
     {
         var parsed = ParseValue(_newItemText);
         if (parsed is null) return;
         Value.Add(parsed);
         _newItemText = string.Empty;
+        _addInputKey++;       // recreates the input element, clearing its value
+        _focusAddInput = true; // keep focus in the input for the next entry
+        await NotifyChanged();
+    }
+
+    // Auto-commit when focus leaves, without stealing focus back
+    private async Task OnAddBlur()
+    {
+        if (string.IsNullOrWhiteSpace(_newItemText)) return;
+        var parsed = ParseValue(_newItemText);
+        if (parsed is null) return;
+        Value.Add(parsed);
+        _newItemText = string.Empty;
+        _addInputKey++;
         await NotifyChanged();
     }
 

@@ -1,10 +1,12 @@
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
     <textarea class="a-textarea"
               disabled="@(Disabled || IsLoading)"
               placeholder="@Placeholder"
-              rows="@CurrentRows"
-              style="@OverflowStyle"
+              @ref="_textareaEl"
               @oninput="OnInput">@Value</textarea>
 </AInputBase>
 
@@ -20,16 +22,33 @@
     [Parameter] public EventCallback<string> OnChange { get; set; }
     [Parameter] public int MaxLines { get; set; } = 10;
 
-    private int LineCount => string.IsNullOrEmpty(Value) ? 1 : Value.Split('\n').Length;
+    private ElementReference _textareaEl;
+    private IJSObjectReference? _module;
 
-    private int CurrentRows => Math.Clamp(LineCount, 1, MaxLines);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/Aco228.BlazorShared/Components/Inputs/ATextArea.razor.js");
+        }
 
-    private string OverflowStyle => LineCount > MaxLines ? "overflow-y:auto" : "overflow-y:hidden";
+        if (_module is not null)
+            await _module.InvokeVoidAsync("autoResize", _textareaEl, MaxLines);
+    }
 
     private async Task OnInput(ChangeEventArgs e)
     {
         Value = e.Value?.ToString() ?? string.Empty;
+        if (_module is not null)
+            await _module.InvokeVoidAsync("autoResize", _textareaEl, MaxLines);
         await ValueChanged.InvokeAsync(Value);
         await OnChange.InvokeAsync(Value);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+            await _module.DisposeAsync();
     }
 }
