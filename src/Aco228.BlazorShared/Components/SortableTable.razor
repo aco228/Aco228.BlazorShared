@@ -89,6 +89,9 @@
         if(_properties.Any())
             return;
         
+        if(Table == null)
+            return;
+        
         _type = Table.GetType().GetGenericArguments().Single();
         var ignoreClasses = new List<Type> { typeof(IdDocument) };
 
