@@ -51,9 +51,9 @@ public class SortableTableProperty<TEntry>
             if (val is long)
             {
                 if (Attribute?.HumanizeDate == true)
-                    return ((long) val).FromUnixTimestampMilliseconds().Humanize();
+                    return ((long) val).ToDateTime().Humanize();
                 if (Attribute?.HumanizeDateUtc == true)
-                    return ((long) val).FromUnixTimestampMillisecondsUtc().Humanize(utcDate: true);   
+                    return ((long) val).ToDateTimeUtc().Humanize(utcDate: true);   
             }
 
             if (val is IdDocument || val.GetType().IsSubclassOf(typeof(IdDocument)))
