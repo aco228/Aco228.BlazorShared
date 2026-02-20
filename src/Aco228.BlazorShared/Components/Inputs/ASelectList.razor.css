@@ -54,7 +54,6 @@
 
 .a-selectlist-chip-toggle:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
 }
 
 .a-selectlist-chip-icon {
@@ -82,7 +81,6 @@
 
 .a-selectlist-chip-remove:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
 }
 
 .a-selectlist-chip--selected .a-selectlist-chip-remove {

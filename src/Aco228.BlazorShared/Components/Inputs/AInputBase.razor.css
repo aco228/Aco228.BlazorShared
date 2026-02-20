@@ -7,8 +7,6 @@
 }
 
 .a-field--disabled {
-    opacity: 0.5;
-    pointer-events: none;
 }
 
 .a-field--loading .a-field-control {
