@@ -1,0 +1,216 @@
+.a-fileinput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* ── Drop zone ─────────────────────────────────────────────────────────── */
+
+.a-fileinput-dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    outline: none;
+    user-select: none;
+}
+
+.a-fileinput-dropzone:focus-visible {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+}
+
+.a-fileinput-dropzone--dragging {
+    border-color: #6366f1;
+    background-color: rgb(99 102 241 / 0.04);
+}
+
+.a-fileinput-dropzone--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.a-fileinput-dropzone-icon {
+    color: #9ca3af;
+    transition: color 0.15s ease;
+    line-height: 0;
+}
+
+.a-fileinput-dropzone--dragging .a-fileinput-dropzone-icon {
+    color: #6366f1;
+}
+
+.a-fileinput-dropzone-text {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.a-fileinput-dropzone-hint {
+    margin: 0;
+    font-size: 0.6875rem;
+    color: #9ca3af;
+}
+
+.a-fileinput-browse {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #6366f1;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+}
+
+.a-fileinput-browse:hover:not(:disabled) {
+    color: #4f46e5;
+}
+
+.a-fileinput-browse:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* ── Staged file list ───────────────────────────────────────────────────── */
+
+.a-fileinput-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.a-fileinput-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4375rem 0.625rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #f9fafb;
+    min-width: 0;
+}
+
+.a-fileinput-item-icon {
+    flex-shrink: 0;
+    color: #9ca3af;
+    line-height: 0;
+}
+
+.a-fileinput-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.0625rem;
+}
+
+.a-fileinput-item-name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.a-fileinput-item-meta {
+    font-size: 0.6875rem;
+    color: #9ca3af;
+}
+
+.a-fileinput-item-remove {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: #9ca3af;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    line-height: 0;
+}
+
+.a-fileinput-item-remove:hover:not(:disabled) {
+    color: #ef4444;
+    background-color: rgb(239 68 68 / 0.08);
+}
+
+.a-fileinput-item-remove:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+/* ── Actions row ────────────────────────────────────────────────────────── */
+
+.a-fileinput-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.a-fileinput-clear {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    transition: color 0.15s ease;
+}
+
+.a-fileinput-clear:hover:not(:disabled) {
+    color: #ef4444;
+}
+
+.a-fileinput-clear:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.a-fileinput-upload {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.4375rem 0.875rem;
+    background-color: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    line-height: 1;
+}
+
+.a-fileinput-upload:hover:not(:disabled) {
+    background-color: #4f46e5;
+}
+
+.a-fileinput-upload:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+}
