@@ -2,9 +2,9 @@
 
 public class VisibilityModel
 {
-    public bool IsVisible { get; set; } = true;
+    public bool IsVisible { get; set; } = false;
 
-    public VisibilityModel(bool isVisible = true)
+    public VisibilityModel(bool isVisible = false)
     {
         IsVisible = isVisible;
     }
