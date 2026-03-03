@@ -1,0 +1,53 @@
+﻿@using Aco228.BlazorShared.Code
+@using Aco228.BlazorShared.Components.Buttons
+@using Aco228.BlazorShared.Components.Page
+
+@if (_confirmRequest != null)
+{
+    <ModalBase Title="@_confirmRequest.Title" IsOpen="true" IsOpenChanged="OnModalClose">
+        <div class="description">
+            @_confirmRequest.Description
+        </div>
+        <LayoutRow>
+            <AButton Title="@_confirmRequest.OkText" OnClick="OnConfirmClicked"/>
+            <AButton Title="Cancel" OnClick="OnCancelClicked"/>
+        </LayoutRow>
+    </ModalBase>   
+}
+
+@inherits Aco228.BlazorShared.Code.ComponentImplementation
+@code {
+    [Inject] public IConfirmMediator ConfirmMediator { get; set; }
+    private ConfirmRequest? _confirmRequest;
+
+    protected override void OnInitialized()
+    {
+        ConfirmMediator.OnConfirmReceived += ConfirmMediatorOnOnConfirmReceived;
+    }
+
+    private void ConfirmMediatorOnOnConfirmReceived(object? sender, ConfirmRequest e)
+    {
+        _confirmRequest = e;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnModalClose(bool obj)
+    {
+        if(obj == false)
+            _confirmRequest = null;
+    }
+
+    private void OnConfirmClicked()
+    {
+        _confirmRequest.ConfirmAction();
+        _confirmRequest = null;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCancelClicked()
+    {
+        _confirmRequest = null;
+        InvokeAsync(StateHasChanged);
+    }
+
+}

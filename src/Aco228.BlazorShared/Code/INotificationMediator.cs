@@ -8,3 +8,28 @@ public interface INotificationMediator
     void NotifySuccess(string title, string description);
     void NotifyError(string title, string description);
 }
+
+public class NotificationMediator : INotificationMediator
+{
+    public event EventHandler<NotificationDto>? OnNotificationReceived;
+
+    public void NotifySuccess(string title, string description)
+    {
+        OnNotificationReceived?.Invoke(this, new NotificationDto
+        {
+            Type = NotificationType.Success,
+            Title = title,
+            Description = description
+        });
+    }
+
+    public void NotifyError(string title, string description)
+    {
+        OnNotificationReceived?.Invoke(this, new NotificationDto
+        {
+            Type = NotificationType.Error,
+            Title = title,
+            Description = description
+        });
+    }
+}

@@ -7,6 +7,7 @@ public class ComponentImplementation : ComponentBase
 {
     [Inject] public NavigationManager Navigation { get; set; }
     [Inject] public INotificationMediator Notifications { get; set; }
+    [Inject] public IConfirmMediator Confirm { get; set; }
     [Parameter] public VisibilityModel? Visibility { get; set; }
     
     public bool IsInitialized { get; set; } = false;
