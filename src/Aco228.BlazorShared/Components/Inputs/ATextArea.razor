@@ -49,6 +49,15 @@
     public async ValueTask DisposeAsync()
     {
         if (_module is not null)
-            await _module.DisposeAsync();
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already disconnected — JS interop unavailable, nothing to clean up
+            }
+        }
     }
 }
