@@ -9,6 +9,13 @@ public class UIModel<TEntry>
 
 public static class UIModelExtensions
 {
+    public static UIModel<TEntry> ToUIModel<TEntry>(
+        this TEntry entry, 
+        bool isVisibleByDefault = true)
+    {
+        return new UIModel<TEntry>{ Entry = entry, IsVisible = isVisibleByDefault };
+    } 
+    
     public static List<UIModel<TEntry>> ToUIModels<TEntry>(
         this IEnumerable<TEntry> entries, 
         bool isVisibleByDefault = true)
