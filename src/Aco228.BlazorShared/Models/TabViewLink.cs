@@ -2,6 +2,7 @@ namespace Aco228.BlazorShared.Models;
 
 public class TabViewLink
 {
+    public bool ForAdmin { get; set; } = false;
     public string Title { get; set; }
     public string Href { get; set; }
 
