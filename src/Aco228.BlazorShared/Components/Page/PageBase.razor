@@ -29,7 +29,6 @@
                 <span>@Page.ErrorMessage</span>
             </div>
         }
-
         <div class="page-body">
             @if (DisplayLoading && Page.CombinedIsLoading)
             {
@@ -41,6 +40,13 @@
                 @ChildContent
             </div>
         </div>
+        @if (!string.IsNullOrEmpty(Page.ErrorMessage))
+        {
+            <div class="page-error">
+                <span class="page-error-icon">!</span>
+                <span>@Page.ErrorMessage</span>
+            </div>
+        }
     }
 </div>
 
