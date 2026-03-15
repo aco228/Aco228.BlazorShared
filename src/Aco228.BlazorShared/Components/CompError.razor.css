@@ -1,0 +1,28 @@
+﻿.page-error {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 0.875rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.page-error-icon {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
