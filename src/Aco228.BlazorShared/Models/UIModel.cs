@@ -2,6 +2,7 @@
 
 public class UIModel<TEntry>
 {
+    public int Index { get; set; } = 0;
     public bool IsVisible { get; set; }
     public bool IsSelected { get; set; }
     public TEntry Entry { get; set; }
