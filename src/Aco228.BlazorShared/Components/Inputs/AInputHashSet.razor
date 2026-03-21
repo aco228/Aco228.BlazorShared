@@ -1,0 +1,155 @@
+@typeparam TItem
+
+<AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
+    <div class="a-input-list">
+        @for (var i = 0; i < _items.Count; i++)
+        {
+            var index = i;
+            <div class="a-input-list-item">
+                <span class="a-input-list-index">@(index + 1).</span>
+                <input class="a-input-list-value"
+                       type="@InputType"
+                       value="@_items[index]"
+                       disabled="@(Disabled || IsLoading)"
+                       @onchange="e => UpdateItem(index, e)"
+                       @key="@($"{index}_{_items[index]}")" />
+                <button class="a-input-list-btn a-input-list-btn--remove"
+                        type="button"
+                        disabled="@(Disabled || IsLoading)"
+                        @onclick="() => RemoveItem(index)"
+                        title="Remove">
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
+            </div>
+        }
+        <div class="a-input-list-item @(string.IsNullOrEmpty(_newItemText) ? "a-input-list-item--add" : "")">
+            <span class="a-input-list-index @(string.IsNullOrEmpty(_newItemText) ? "a-input-list-index--add" : "")">
+                @if (string.IsNullOrEmpty(_newItemText))
+                {
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                }
+                else
+                {
+                    @(Value.Count + 1)<text>.</text>
+                }
+            </span>
+            <input class="a-input-list-value"
+                   type="@InputType"
+                   placeholder="@(Placeholder ?? "Add item...")"
+                   disabled="@(Disabled || IsLoading)"
+                   @key="_addInputKey"
+                   @ref="_addInputRef"
+                   @oninput="e => _newItemText = e.Value?.ToString() ?? string.Empty"
+                   @onblur="OnAddBlur"
+                   @onkeydown="OnAddKeyDown" />
+            <button class="a-input-list-btn a-input-list-btn--add"
+                    type="button"
+                    disabled="@(Disabled || IsLoading || string.IsNullOrWhiteSpace(_newItemText))"
+                    @onclick="AddItem"
+                    title="Add">
+                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+            </button>
+        </div>
+    </div>
+</AInputBase>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public int Width { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public HashSet<TItem> Value { get; set; } = new();
+    [Parameter] public EventCallback<HashSet<TItem>> ValueChanged { get; set; }
+    [Parameter] public EventCallback<HashSet<TItem>> OnChange { get; set; }
+
+    // Snapshot list used for indexed rendering and mutation; rebuilt whenever Value changes.
+    private List<TItem> _items = new();
+
+    private string _newItemText = string.Empty;
+    private int _addInputKey = 0;
+    private ElementReference _addInputRef;
+    private bool _focusAddInput;
+
+    protected override void OnParametersSet()
+    {
+        _items = Value.ToList();
+    }
+
+    private string InputType => typeof(TItem) == typeof(int) || typeof(TItem) == typeof(long)
+        || typeof(TItem) == typeof(double) || typeof(TItem) == typeof(float)
+        || typeof(TItem) == typeof(decimal)
+        ? "number" : "text";
+
+    private TItem? ParseValue(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return default;
+        try { return (TItem)Convert.ChangeType(input, typeof(TItem)); }
+        catch { return default; }
+    }
+
+    private async Task NotifyChanged()
+    {
+        await ValueChanged.InvokeAsync(Value);
+        await OnChange.InvokeAsync(Value);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusAddInput)
+        {
+            _focusAddInput = false;
+            await _addInputRef.FocusAsync();
+        }
+    }
+
+    private async Task AddItem()
+    {
+        var parsed = ParseValue(_newItemText);
+        if (parsed is null) return;
+        Value.Add(parsed);
+        _items = Value.ToList();
+        _newItemText = string.Empty;
+        _addInputKey++;       // recreates the input element, clearing its value
+        _focusAddInput = true; // keep focus in the input for the next entry
+        await NotifyChanged();
+    }
+
+    // Auto-commit when focus leaves, without stealing focus back
+    private async Task OnAddBlur()
+    {
+        if (string.IsNullOrWhiteSpace(_newItemText)) return;
+        var parsed = ParseValue(_newItemText);
+        if (parsed is null) return;
+        Value.Add(parsed);
+        _items = Value.ToList();
+        _newItemText = string.Empty;
+        _addInputKey++;
+        await NotifyChanged();
+    }
+
+    private async Task RemoveItem(int index)
+    {
+        if (index < 0 || index >= _items.Count) return;
+        Value.Remove(_items[index]);
+        _items = Value.ToList();
+        await NotifyChanged();
+    }
+
+    private async Task UpdateItem(int index, ChangeEventArgs e)
+    {
+        var parsed = ParseValue(e.Value?.ToString());
+        if (parsed is null || index < 0 || index >= _items.Count) return;
+        Value.Remove(_items[index]);
+        Value.Add(parsed);
+        _items = Value.ToList();
+        await NotifyChanged();
+    }
+
+    private async Task OnAddKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_newItemText))
+            await AddItem();
+    }
+}
