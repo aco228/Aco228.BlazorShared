@@ -1,10 +1,11 @@
 
 <AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
     <input class="a-input"
-           type="number"
-           @bind="Value"
-           @bind:event="oninput"
-           @bind:after="NotifyChanged"
+           type="text"
+           inputmode="decimal"
+           value="@_display"
+           @oninput="OnInput"
+           @onblur="OnBlur"
            disabled="@(Disabled || IsLoading)"
            placeholder="@Placeholder" />
 </AInputBase>
@@ -20,9 +21,43 @@
     [Parameter] public EventCallback<double> ValueChanged { get; set; }
     [Parameter] public EventCallback<double> OnChange { get; set; }
 
-    private async Task NotifyChanged()
+    private string _display = "";
+    private bool _userEditing = false;
+
+    protected override void OnParametersSet()
     {
-        await ValueChanged.InvokeAsync(Value);
-        await OnChange.InvokeAsync(Value);
+        if (!_userEditing)
+            _display = Value == 0 ? "" : Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        _userEditing = true;
+        _display = e.Value?.ToString() ?? "";
+
+        if (double.TryParse(_display, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+        {
+            Value = parsed;
+            await ValueChanged.InvokeAsync(Value);
+            await OnChange.InvokeAsync(Value);
+        }
+    }
+
+    private async Task OnBlur()
+    {
+        _userEditing = false;
+        if (double.TryParse(_display, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+        {
+            _display = parsed.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            Value = parsed;
+            await ValueChanged.InvokeAsync(Value);
+            await OnChange.InvokeAsync(Value);
+        }
+        else
+        {
+            _display = Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
     }
 }
