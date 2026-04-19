@@ -6,6 +6,11 @@
             @onchange="OnSelect">
         @foreach (var entry in _entries)
         {
+            if (Supported != null && !Supported.Contains(entry))
+            {
+                continue;
+            }
+            
             <option value="@entry.ToString()" selected="@(entry.Equals(Value))">@FormatName(entry)</option>
         }
     </select>
@@ -18,6 +23,7 @@
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public int Width { get; set; }
     [Parameter] public TEntry Value { get; set; } = default!;
+    [Parameter] public List<TEntry>? Supported { get; set; } = null;
     [Parameter] public EventCallback<TEntry> ValueChanged { get; set; }
     [Parameter] public EventCallback<TEntry> OnChange { get; set; }
 
