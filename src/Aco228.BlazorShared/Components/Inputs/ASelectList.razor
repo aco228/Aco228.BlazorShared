@@ -80,6 +80,11 @@
 
     private string _newItemText = string.Empty;
 
+    protected override void OnParametersSet()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private string FormatEntry(TEntry entry)
     {
         if (DisplayFunc is not null)
