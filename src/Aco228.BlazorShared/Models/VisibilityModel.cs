@@ -9,8 +9,8 @@ public class VisibilityModel
         IsVisible = isVisible;
     }
 
-    public void OnChange()
+    public void OnChange(bool? newValue = null)
     {
-        IsVisible = !IsVisible;
+        IsVisible =  newValue ?? !IsVisible;
     }
 }
