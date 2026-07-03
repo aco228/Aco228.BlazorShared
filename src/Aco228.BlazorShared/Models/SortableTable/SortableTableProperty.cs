@@ -48,6 +48,18 @@ public class SortableTableProperty<TEntry>
                 return ((double) val).ToDoubleString();
             }
 
+            if (val is string)
+            {
+                if (Attribute?.MaximumCharacterCount > 0)
+                {
+                    var value = (string) val;
+                    if (value.Length > Attribute.MaximumCharacterCount)
+                        value = value.Substring(0, Attribute.MaximumCharacterCount);
+                    
+                    return value;
+                }
+            }
+
             if (val is long)
             {
                 if (Attribute?.HumanizeDate == true)

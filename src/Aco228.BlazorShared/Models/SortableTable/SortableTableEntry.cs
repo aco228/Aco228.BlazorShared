@@ -10,6 +10,7 @@ public class SortableTableNameAttribute : Attribute
     public bool Clickable { get; set; } = false;
     public bool HumanizeDate { get; set; } = false;
     public bool HumanizeDateUtc { get; set; } = false;
+    public int MaximumCharacterCount { get; set; } = -1;
     public string? Url { get; set; }
     public string? UrlParamName { get; set; }
 }
