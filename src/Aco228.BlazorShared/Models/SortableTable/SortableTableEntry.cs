@@ -8,6 +8,7 @@ public class SortableTableNameAttribute : Attribute
     public string Name { get; set; }
     public bool Ignore { get; set; } = false;
     public bool Clickable { get; set; } = false;
+    public string? AHref { get; set; } = null;
     public bool HumanizeDate { get; set; } = false;
     public bool HumanizeDateUtc { get; set; } = false;
     public int MaximumCharacterCount { get; set; } = -1;

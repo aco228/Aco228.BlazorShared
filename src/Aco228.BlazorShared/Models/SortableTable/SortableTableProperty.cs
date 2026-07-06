@@ -29,6 +29,14 @@ public class SortableTableProperty<TEntry>
         }
     }
 
+    public string GetAhrefLink(TEntry entry)
+    {
+        if (string.IsNullOrEmpty(Attribute?.AHref))
+            return "";
+        
+        return Attribute.AHref.Replace("{}", GetValue(entry));
+    }
+
     public string GetValue(TEntry input)
     {
         var val = PropertyInfo.GetValue(input);
