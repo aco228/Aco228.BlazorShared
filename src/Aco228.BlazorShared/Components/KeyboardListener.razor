@@ -1,10 +1,10 @@
+@using Aco228.BlazorShared.Services
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
 @code {
-    [Parameter] public EventCallback<KeyPressEventArgs> OnKeyDown { get; set; }
-    [Parameter] public List<string>? ListenForKeys { get; set; } // e.g. "Escape"; null = fire on every key
+    [Inject] public IKeyboardListenerService? KeyboardListenerService { get; set; }
 
     private IJSObjectReference? _module;
     private DotNetObjectReference<KeyboardListener>? _dotNetRef;
@@ -12,7 +12,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender) return;
+        if (!firstRender || KeyboardListenerService == null) return;
 
         var packageId = typeof(KeyboardListener).Assembly.GetName().Name;
         var modulePath = $"./_content/{packageId}/Components/KeyboardListener.razor.js";
@@ -24,10 +24,8 @@
     [JSInvokable]
     public async Task HandleKeyDown(string key, bool ctrl, bool shift, bool alt)
     {
-        if (ListenForKeys != null && ListenForKeys.Any(x => x.Equals(key, StringComparison.InvariantCultureIgnoreCase)))
-            return;
-
-        await OnKeyDown.InvokeAsync(new KeyPressEventArgs(key, ctrl, shift, alt));
+        if(KeyboardListenerService != null)
+            await KeyboardListenerService?.TryInvoke(shift, ctrl, key);
     }
 
     public async ValueTask DisposeAsync()
