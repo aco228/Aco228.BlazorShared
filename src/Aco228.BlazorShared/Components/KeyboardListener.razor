@@ -14,35 +14,56 @@
     {
         if (!firstRender || KeyboardListenerService == null) return;
 
-        var packageId = typeof(KeyboardListener).Assembly.GetName().Name;
-        var modulePath = $"./_content/{packageId}/Components/KeyboardListener.razor.js";
-        _module = await JS.InvokeAsync<IJSObjectReference>("import", modulePath);
-        _dotNetRef = DotNetObjectReference.Create(this);
-        await _module.InvokeVoidAsync("register", _id, _dotNetRef);
+        try
+        {
+            var packageId = typeof(KeyboardListener).Assembly.GetName().Name;
+            var modulePath = $"./_content/{packageId}/Components/KeyboardListener.razor.js";
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", modulePath);
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await _module.InvokeVoidAsync("register", _id, _dotNetRef);
+        }
+        catch
+        {
+            //
+        }
     }
 
     [JSInvokable]
     public async Task<bool> HandleKeyDown(string key, bool ctrl, bool shift, bool alt)
     {
-        if (KeyboardListenerService == null)
-            return false;
-
-        if (!KeyboardListenerService.Exists(shift, ctrl, key, out var shouldBePrevented))
+        try
         {
-            return false;   
+            if (KeyboardListenerService == null)
+                return false;
+
+            if (!KeyboardListenerService.Exists(shift, ctrl, key, out var shouldBePrevented))
+            {
+                return false;
+            }
+
+            KeyboardListenerService?.TryInvoke(shift, ctrl, key).ConfigureAwait(false);
+            return shouldBePrevented;
         }
-        
-        KeyboardListenerService?.TryInvoke(shift, ctrl, key).ConfigureAwait(false);
-        return shouldBePrevented;
+        catch
+        {
+            return false;
+        }
     }
 
     [JSInvokable]
     public async Task<List<string>> GetPreventableKeys()
     {
-        if (KeyboardListenerService == null)
+        try
+        {
+            if (KeyboardListenerService == null)
+                return new();
+
+            return KeyboardListenerService.GetPreventableKeys();
+        }
+        catch
+        {
             return new();
-        
-        return KeyboardListenerService.GetPreventableKeys();
+        }
     }
 
     public async ValueTask DisposeAsync()
