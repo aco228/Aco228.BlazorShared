@@ -2,6 +2,7 @@
 <AInputBase Title="@Title" Subtitle="@Subtitle" Disabled="@Disabled" IsLoading="@IsLoading" Width="@Width">
     <input class="a-input"
            type="text"
+           @ref="_inputElement"
            @bind="Value"
            @bind:event="oninput"
            @bind:after="NotifyChanged"
@@ -19,10 +20,17 @@
     [Parameter] public string? Value { get; set; } = string.Empty;
     [Parameter] public EventCallback<string?> ValueChanged { get; set; }
     [Parameter] public EventCallback<string?> OnChange { get; set; }
+    private ElementReference _inputElement;
+    
 
     private async Task NotifyChanged()
     {
         await ValueChanged.InvokeAsync(Value);
         await OnChange.InvokeAsync(Value);
+    }
+
+    public async Task FocusAsync()
+    {
+        await _inputElement.FocusAsync();
     }
 }

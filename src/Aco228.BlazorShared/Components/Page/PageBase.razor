@@ -2,14 +2,16 @@
 @implements IDisposable
 
 <div class="page">
-    <div class="page-header">
-        <h1 class="title">@Page.Title</h1>
-        @if (!string.IsNullOrEmpty(Page.Subtitle))
-        {
-            <p class="subtitle">@Page.Subtitle</p>
-        }
-    </div>
-    
+    @if (DisplayHeader)
+    {
+        <div class="page-header">
+            <h1 class="title">@Page.Title</h1>
+            @if (!string.IsNullOrEmpty(Page.Subtitle))
+            {
+                <p class="subtitle">@Page.Subtitle</p>
+            }
+        </div>   
+    }
     @if (!Page.IsInitialized)
     {
         <div class="page-loading-overlay">
@@ -29,6 +31,7 @@
                 <span>@Page.ErrorMessage</span>
             </div>
         }
+
         <div class="page-body">
             @if (DisplayLoading && Page.CombinedIsLoading)
             {
@@ -54,6 +57,7 @@
     [Parameter] public PageImplementation Page { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool DisplayLoading { get; set; } = false;
+    [Parameter] public bool DisplayHeader { get; set; } = true;
 
     private PageImplementation? _subscribedPage;
 
