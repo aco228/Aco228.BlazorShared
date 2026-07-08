@@ -68,12 +68,20 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_module != null)
+        try
         {
-            await _module.InvokeVoidAsync("unregister", _id);
-            await _module.DisposeAsync();
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("unregister", _id);
+                await _module.DisposeAsync();
+            }
+
+            _dotNetRef?.Dispose();
         }
-        _dotNetRef?.Dispose();
+        catch
+        {
+            //
+        }
     }
     
 }
