@@ -7,8 +7,11 @@ function ensureInit() {
     document.addEventListener('keydown', async (e) => {
         if (preventableKeys.includes(e.key))
         {
-            console.log('prevenented keys: ' + e.key)
             e.preventDefault();   
+        } 
+        else if (isTypingContext(e.target, e.key)) 
+        {
+            return; // let the input handle it normally
         }
         
         for (const dotNetRef of listeners.values()) {
@@ -16,6 +19,19 @@ function ensureInit() {
         }
     });
     initialized = true;
+}
+
+function isTypingContext(target, key) {
+    const isInputElement = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+    );
+    if (!isInputElement) return false;
+
+    const isAlphanumeric = key.length === 1 && /[a-zA-Z0-9]/.test(key);
+    return isAlphanumeric;
 }
 
 export function setPreventableKeys(dotNetRef) {
