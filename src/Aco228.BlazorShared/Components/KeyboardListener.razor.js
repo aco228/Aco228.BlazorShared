@@ -5,11 +5,14 @@ let preventableKeys = [];
 function ensureInit() {
     if (initialized) return;
     document.addEventListener('keydown', async (e) => {
+        if (e.ctrlKey)
+            return;
+        
         if (preventableKeys.includes(e.key))
         {
             e.preventDefault();   
         } 
-        else if (e.ctrlKey || isTypingContext(e.target, e.key)) 
+        else if (isTypingContext(e.target, e.key)) 
         {
             return; // let the input handle it normally
         }
