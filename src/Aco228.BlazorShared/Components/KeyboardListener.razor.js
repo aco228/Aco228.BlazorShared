@@ -5,6 +5,7 @@ let preventableKeys = [];
 function ensureInit() {
     if (initialized) return;
     document.addEventListener('keydown', async (e) => {
+        
         if (e.ctrlKey)
             return;
         
