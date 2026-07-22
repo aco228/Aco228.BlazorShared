@@ -3,7 +3,7 @@ using Aco228.Common.Models;
 
 namespace Aco228.BlazorShared.Services;
 
-public interface IKeyboardListenerService : ITransient
+public interface IKeyboardListenerService : IScoped
 {
     void Register(string key, KeyboardListenerModel model, Func<Task> callback);
     void Remove(string key);
