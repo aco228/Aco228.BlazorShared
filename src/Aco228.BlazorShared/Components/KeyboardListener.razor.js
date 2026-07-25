@@ -6,7 +6,7 @@ function ensureInit() {
     if (initialized) return;
     document.addEventListener('keydown', async (e) => {
         
-        if (e.ctrlKey)
+        if (e.ctrlKey || e.metaKey)
             return;
         
         if (preventableKeys.includes(e.key))
