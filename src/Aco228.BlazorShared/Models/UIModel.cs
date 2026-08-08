@@ -32,4 +32,16 @@ public static class UIModelExtensions
 
         return result;
     }
+
+    public static void DeselectAll<TEntry>(this List<UIModel<TEntry>> list)
+    {
+        foreach (var entry in list)
+            entry.IsSelected = false;
+    }
+
+    public static void SelectAll<TEntry>(this List<UIModel<TEntry>> list)
+    {
+        foreach (var entry in list)
+            entry.IsSelected = true;
+    }
 }
