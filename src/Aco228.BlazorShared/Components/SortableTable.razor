@@ -4,7 +4,8 @@
 @using Aco228.MongoDb.Models
 
 <SectionBase Title="@Title" Subtitle="@Subtitle">
-    <table class="simple-table">
+    <div class="simple-table-wrapper">
+        <table class="simple-table">
         <tr>
             @if (IsSelectable)
             {
@@ -72,7 +73,8 @@
                 }
             </tr>
         }
-    </table>
+        </table>
+    </div>
 </SectionBase>
 
 @typeparam TEntry where TEntry : Aco228.BlazorShared.Models.SortableTable.SortableTableEntry
