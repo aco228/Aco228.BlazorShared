@@ -42,7 +42,6 @@ export function setPreventableKeys(dotNetRef) {
     setInterval(async () => {
         const preventables = await dotNetRef.invokeMethodAsync('GetPreventableKeys');
         preventableKeys = preventables;
-        console.log('preventable keys: ' + JSON.stringify(preventableKeys))
     }, 800);    
 }
 
