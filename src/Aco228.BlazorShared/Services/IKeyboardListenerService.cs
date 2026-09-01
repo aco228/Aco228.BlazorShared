@@ -59,11 +59,15 @@ public class KeywordListenerService : IKeyboardListenerService
             return;
 
         var model = new KeyboardListenerModel() { ShiftPressed = isShiftPressed, CtrlPressed = isCtrlPressed, KeyPress = keyPress};
-        var evt = Events.FirstOrDefault(x => x.Model.UniqueKey == model.UniqueKey);
-        if (evt == null)
-            return;
-        
-        await evt.Callback();
+        foreach (var evt in Events.Where(x => x.Model.UniqueKey == model.UniqueKey))
+            try
+            {
+                await evt.Callback();
+            }
+            catch (Exception ex)    
+            {
+                //
+            }
     }
 
     public List<string> GetPreventableKeys()
