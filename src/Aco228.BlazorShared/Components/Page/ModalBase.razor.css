@@ -10,6 +10,10 @@
     animation: modal-fade-in 0.15s ease;
 }
 
+.modal-overlay-top-level{
+    z-index: 10000!important;
+}
+
 .modal-panel {
     background: #fff;
     border-radius: 10px;

@@ -4,7 +4,7 @@
 
 @if (IsOpen)
 {
-    <div class="modal-overlay" @onmousedown="OnOverlayMouseDown" @onclick="OnOverlayClicked">
+    <div class="modal-overlay @GetModalClasses()" @onmousedown="OnOverlayMouseDown" @onclick="OnOverlayClicked">
         <div class="modal-panel" @onmousedown:stopPropagation="true" @onclick:stopPropagation="true">
             <div class="modal-header">
                 <span class="modal-title">@Title</span>
@@ -53,11 +53,18 @@
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public bool TopLevel { get; set; } = false;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     private string _referenceId { get; set; } = IdHelper.GetId();
     
     [Inject] public IKeyboardListenerService? KeyboardListenerService { get; set; }
-    
+
+    public string GetModalClasses()
+    {
+        var classes = new List<string>();
+        if(TopLevel) classes.Add("modal-overlay-top-level");
+        return string.Join(" ", classes);
+    }
 
     private async Task Close()
     {

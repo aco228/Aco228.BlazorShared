@@ -4,7 +4,7 @@
 
 @if (_confirmRequest != null)
 {
-    <ModalBase Title="@_confirmRequest.Title" IsOpen="true" IsOpenChanged="OnModalClose">
+    <ModalBase Title="@_confirmRequest.Title" IsOpen="true" IsOpenChanged="OnModalClose" TopLevel="true">
         <div class="description">
             @_confirmRequest.Description
         </div>
