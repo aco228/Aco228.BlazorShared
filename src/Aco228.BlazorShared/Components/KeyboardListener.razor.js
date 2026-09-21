@@ -5,6 +5,8 @@ let preventableKeys = [];
 function ensureInit() {
     if (initialized) return;
     document.addEventListener('keydown', async (e) => {
+        if (shouldIgnoreKeyboardShortcuts(e))
+            return;
         
         if (e.ctrlKey || e.metaKey)
             return;
@@ -23,6 +25,16 @@ function ensureInit() {
         }
     });
     initialized = true;
+}
+
+function shouldIgnoreKeyboardShortcuts(event) {
+    const eventPath = typeof event.composedPath === 'function'
+        ? event.composedPath()
+        : [event.target];
+
+    return eventPath.some(element =>
+        element instanceof Element &&
+        element.matches('[data-keyboard-shortcuts="off"], [data-keyboard-shortcuts="off"] *'));
 }
 
 function isTypingContext(target, key) {
