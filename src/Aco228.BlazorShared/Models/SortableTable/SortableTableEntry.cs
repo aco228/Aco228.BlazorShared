@@ -14,6 +14,8 @@ public class SortableTableNameAttribute : Attribute
     public int MaximumCharacterCount { get; set; } = -1;
     public string? Url { get; set; }
     public string? UrlParamName { get; set; }
+    public bool Indicator { get; set; } = false;
+    public bool IndicatorInverted { get; set; } = false;
 }
 
 public class SortableTableEntry

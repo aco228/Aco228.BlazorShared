@@ -50,7 +50,12 @@
                     if (string.IsNullOrEmpty(prop.Url))
                     {
                         <td>
-                            @if (prop.Attribute?.Clickable == true)
+                            @if (prop.Attribute?.Indicator == true && prop.PropertyInfo.GetValue(obj) is bool indicatorValue)
+                            {
+                                var isOk = prop.Attribute.IndicatorInverted ? !indicatorValue : indicatorValue;
+                                <span class="st-dot @(isOk ? "st-dot--on" : "st-dot--off")" title="@(indicatorValue ? "Yes" : "No")"></span>
+                            }
+                            else if (prop.Attribute?.Clickable == true)
                             {
                                 <a href="javascript:void(0)" @onclick="() => OnPropertyClicked(prop.Name, obj)">@prop.GetValue(obj)</a>
                             }

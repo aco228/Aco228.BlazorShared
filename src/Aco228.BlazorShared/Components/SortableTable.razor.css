@@ -49,3 +49,20 @@
     transform: scale(0.9);
     margin: 0;
 }
+
+/* indicator */
+.st-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.st-dot--on {
+    background-color: #22c55e;
+}
+
+.st-dot--off {
+    background-color: #ef4444;
+}
